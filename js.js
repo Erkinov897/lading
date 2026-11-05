@@ -1,91 +1,36 @@
 
-// NOVA WEBSITE JAVASCRIPT
+// NOVA - Main JavaScript
 
-// Mobile menu
-const menuBtn = document.getElementById("menuBtn");
-const nav = document.getElementById("nav");
-
-menuBtn.addEventListener("click", () => {
-    nav.classList.toggle("active");
-
-    menuBtn.textContent = nav.classList.contains("active")
-        ? "✕"
-        : "☰";
+// LOADER
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        document.getElementById("loader").classList.add("hide");
+    }, 700);
 });
 
-// Menu yopish
-document.querySelectorAll(".nav a").forEach(link => {
+// MOBILE MENU
+const menuToggle = document.getElementById("menuToggle");
+const navLinks = document.getElementById("navLinks");
+
+menuToggle.addEventListener("click", () => {
+    menuToggle.classList.toggle("active");
+    navLinks.classList.toggle("active");
+});
+
+document.querySelectorAll(".nav-links a").forEach(link => {
     link.addEventListener("click", () => {
-        nav.classList.remove("active");
-        menuBtn.textContent = "☰";
+        menuToggle.classList.remove("active");
+        navLinks.classList.remove("active");
     });
 });
 
-// Toast notification
-const toast = document.getElementById("toast");
-let toastTimer;
+// CURRENT YEAR
+document.getElementById("year").textContent =
+    new Date().getFullYear();
 
-function showToast(message) {
-    toast.textContent = message;
-    toast.classList.add("show");
-
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-    }, 3000);
-}
-
-// Tarif tanlash
-document.querySelectorAll(".price-btn").forEach(button => {
-    button.addEventListener("click", () => {
-        const plan = button.dataset.plan;
-
-        document.getElementById("userSubject").value = "Xizmatlar";
-        document.getElementById("userMessage").value =
-            "Men " + plan + " tarifiga qiziqyapman.";
-
-        document.getElementById("contact").scrollIntoView({
-            behavior: "smooth"
-        });
-
-        showToast(plan + " tarifi tanlandi!");
-    });
-});
-
-// Contact form
-const contactForm = document.getElementById("contactForm");
-
-contactForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const name = document.getElementById("userName").value.trim();
-    const email = document.getElementById("userEmail").value.trim();
-    const subject = document.getElementById("userSubject").value;
-    const message = document.getElementById("userMessage").value.trim();
-    const status = document.getElementById("formStatus");
-
-    if (!name || !email || !subject || !message) {
-        status.textContent = "Iltimos, barcha maydonlarni to‘ldiring.";
-        return;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        status.textContent = "Email manzilini tekshiring.";
-        return;
-    }
-
-    // Hozircha server ulanmagan demo rejimi
-    status.textContent =
-        "Forma to‘g‘ri to‘ldirildi. Xabar yuborish uchun server ulash kerak.";
-
-    showToast("Ma'lumotlar tekshirildi!");
-
-    contactForm.reset();
-});
-
-// Scroll animation
+// SCROLL ANIMATION
 const revealElements = document.querySelectorAll(
-    ".about-card, .service-card, .price-card, .section-label, .section h2, .section-text, .contact-form, .banner-content"
+    ".about-content, .service-card, .feature-item, .contact-info, .contact-form"
 );
 
 revealElements.forEach(element => {
@@ -103,38 +48,74 @@ const observer = new IntersectionObserver((entries) => {
     threshold: 0.12
 });
 
-revealElements.forEach(element => {
-    observer.observe(element);
-});
+revealElements.forEach(element => observer.observe(element));
 
-// Navigation active effect
-const sections = document.querySelectorAll("main section[id]");
-const navLinks = document.querySelectorAll(".nav a");
+// HEADER SCROLL EFFECT
+const header = document.getElementById("header");
 
 window.addEventListener("scroll", () => {
-    let current = "";
+    if (window.scrollY > 50) {
+        header.style.background = "rgba(8, 8, 8, 0.96)";
+    } else {
+        header.style.background = "rgba(8, 8, 8, 0.75)";
+    }
+});
 
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop - 120;
+// TOAST NOTIFICATION
+function showToast(message) {
+    const toast = document.getElementById("toast");
 
-        if (window.scrollY >= sectionTop) {
-            current = section.getAttribute("id");
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3000);
+}
+
+// CONTACT FORM
+const contactForm = document.getElementById("contactForm");
+const formStatus = document.getElementById("formStatus");
+
+contactForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const message = document.getElementById("message").value.trim();
+
+    if (!name || !email || !message) {
+        showToast("Iltimos, barcha maydonlarni to‘ldiring!");
+        return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast("Elektron pochta manzili noto‘g‘ri!");
+        return;
+    }
+
+    formStatus.textContent =
+        "Forma tekshirildi. Xabar yuborish uchun server ulash kerak.";
+
+    showToast("Ma'lumotlar to‘g‘ri kiritildi!");
+
+    contactForm.reset();
+});
+
+// NAVIGATION BUTTONS
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener("click", event => {
+        const target = document.querySelector(link.getAttribute("href"));
+
+        if (target) {
+            event.preventDefault();
+
+            target.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
         }
-    });
-
-    navLinks.forEach(link => {
-        link.classList.toggle(
-            "active-link",
-            link.getAttribute("href") === "#" + current
-        );
     });
 });
 
-// Footer year
-const footerText = document.querySelector(".footer p");
-
-footerText.textContent =
-    "© " + new Date().getFullYear() +
-    " NOVA. Barcha huquqlar himoyalangan.";
-
-console.log("NOVA Premium Website ishga tushdi!");
+console.log("NOVA platformasi ishga tushdi!");
